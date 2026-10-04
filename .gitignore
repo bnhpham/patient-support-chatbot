@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.venv/
+venv/
+
+# Env
+.env*
+!.env.example
+
+# Generated / downloaded data
+data/raw/
+data/processed/
+data/indexes/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Attack-probe scripts and their run output
+tests/old_attacks/
+tests/attacks/score_chunk_toolcall_sentinel.py
+tests/
+scripts/poison_index.py
+
+# Editor
+.vscode/
+.idea/
+
+# promptfoo eval cache/output
+promptfoo/
+
+# Working notes, not uploaded
+CLAUDE.md
+SETUP.md
+DESIGN.md
+
+Dockerfile
+docker-compose.yml
+.dockerignore
