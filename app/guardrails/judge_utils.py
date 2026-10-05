@@ -31,13 +31,15 @@ class JudgeVerificationError(Exception):
 # Query LLM as a judge
 def ask_judge(llm_client: LLMClient, system: str, user_message: str, verdict_model: type[T]) -> T:
     try:
-        raw = llm_client.chat([{"role": "user", "content": user_message}], system=system, temperature=0.0)
+        raw = llm_client.chat([{"role": "user", "content": user_message}], system=system, temperature=0.0, prefill="{")
+        logger.info("raw LLM judge output: %s", raw)
     except Exception as exc:
         raise JudgeVerificationError(f"Judge LLM call failed: {exc}") from exc
 
     text = _CODE_FENCE_RE.sub("", raw).strip()
     try:
-        return verdict_model.model_validate_json(text)
+        obj, _ = json.JSONDecoder().raw_decode(text)
+        return verdict_model.model_validate(obj)
     except (ValidationError, json.JSONDecodeError) as exc:
         logger.warning("ask_judge: could not parse verdict from response: %r", raw)
         raise JudgeVerificationError(f"could not parse judge verdict: {exc}") from exc

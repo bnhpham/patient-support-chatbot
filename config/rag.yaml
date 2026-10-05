@@ -63,6 +63,16 @@ guardrails:
   # (app/guardrails/risk_budget.py). Catches slow-boil manipulation spread across many turns that
   # no single message reveals. Fail-closed: a judge-call/parse failure blocks the turn.
   trajectory_analysis: true
+  # Run the trajectory judge every N-th turn (1 = every turn). It also runs on any turn where the
+  # session risk score is at or above trajectory_risk_soft_threshold.
+  trajectory_every_n_turns: 1
+  # Per-turn multiplier applied to the session's existing risk score before the new judge score is
+  # added (score = min(1.0, score * decay + judge_score)). Lower = faster fade of past hits.
+  trajectory_risk_decay: 0.85
+  # Risk score at/above which the judge runs on every turn regardless of trajectory_every_n_turns.
+  trajectory_risk_soft_threshold: 0.5
+  # Risk score at/above which the session is blocked (the flagged response is returned from then on).
+  trajectory_risk_hard_threshold: 0.85
   # HallucinationGuardrail (app/guardrails/hallucination.py): an LLM judge checking every factual
   # claim in the drafted answer against the retrieved context. Runs inside the RAG pipeline after
   # generation. A flagged material claim triggers a regeneration (see generation.max_regenerations

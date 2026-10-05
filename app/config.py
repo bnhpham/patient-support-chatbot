@@ -68,6 +68,10 @@ class GuardrailsConfig(BaseModel):
     rag_injection_detection: bool = False
     rag_injection_threshold: float = 0.8
     trajectory_analysis: bool = False
+    trajectory_every_n_turns: int = 1
+    trajectory_risk_decay: float = 0.85
+    trajectory_risk_soft_threshold: float = 0.5
+    trajectory_risk_hard_threshold: float = 0.85
     hallucination_check: bool = False
     policy_check: bool = False
 

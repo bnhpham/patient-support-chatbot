@@ -113,8 +113,8 @@ def create_app(
 
     # SessionRiskBudget backs only the trajectory guardrail (see risk_budget.py docstring)
     # (not shared with JailbreakGuardrail's own (now-optional) strike tracking).
-    risk_budget = SessionRiskBudget()
-    trajectory_guardrail = trajectory_guardrail or (TrajectoryGuardrail(llm_client=llm_client, risk_budget=risk_budget)
+    risk_budget = SessionRiskBudget(decay=rag_config.guardrails.trajectory_risk_decay, soft_threshold=rag_config.guardrails.trajectory_risk_soft_threshold, hard_threshold=rag_config.guardrails.trajectory_risk_hard_threshold)
+    trajectory_guardrail = trajectory_guardrail or (TrajectoryGuardrail(llm_client=llm_client, risk_budget=risk_budget, every_n_turns=rag_config.guardrails.trajectory_every_n_turns)
                                                     if rag_config.guardrails.trajectory_analysis else None)
 
     chat_service = ChatService(session_service, rag_pipeline, input_guardrail, output_guardrail, trajectory_guardrail)

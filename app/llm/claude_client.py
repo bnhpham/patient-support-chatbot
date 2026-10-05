@@ -29,7 +29,7 @@ DEFAULT_MAX_TOKENS = 16000
 
 
 class LLMClient(Protocol):
-    def chat(self, messages: list[dict], *, system: str | None = None, temperature: float = 0.0) -> str:
+    def chat(self, messages: list[dict], *, system: str | None = None, temperature: float = 0.0, prefill: str | None = None) -> str:
         ...
 
 
@@ -40,7 +40,10 @@ class ClaudeClient:
         self._client = anthropic.Anthropic(api_key=api_key)
 
     # Send query to Claude API
-    def chat(self, messages: list[dict], *, system: str | None = None, temperature: float = 0.0) -> str:
+    def chat(self, messages: list[dict], *, system: str | None = None, temperature: float = 0.0, prefill: str | None = None) -> str:
+
+        if prefill:
+            messages = [*messages, {"role": "assistant", "content": prefill}]
 
         kwargs: dict = {"model": self._model,
                         "max_tokens": self._max_tokens,
@@ -50,4 +53,4 @@ class ClaudeClient:
             kwargs["system"] = system
 
         response = self._client.messages.create(**kwargs)
-        return "".join(block.text for block in response.content if block.type == "text")
+        return (prefill or "") + "".join(block.text for block in response.content if block.type == "text")

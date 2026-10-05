@@ -194,6 +194,10 @@ changes needed. The `guardrails:` section toggles each guardrail independently:
 | `jailbreak_strike_tracking` | `app/guardrails/jailbreak.py` | Turns the strike count blacklist on or off. Off by default, so the row above no longer applies unless this is set to true. |
 | `jailbreak_blacklist_limit` | `app/guardrails/jailbreak.py` | Number of flagged messages a session may have before the next one blacklists it. Only used when `jailbreak_strike_tracking` is true. |
 | `trajectory_analysis` | `app/guardrails/trajectory.py` | Full-transcript LLM judge, run every few turns or once the session risk budget passes its soft threshold. Blocks the session once the budget passes its hard threshold. Fails closed. |
+| `trajectory_every_n_turns` | `app/guardrails/trajectory.py` | Run the trajectory judge every N-th turn (default=1, every turn). It also runs on any turn where the session risk score is at or above `trajectory_risk_soft_threshold`. |
+| `trajectory_risk_decay` | `app/guardrails/risk_budget.py` | Per-turn multiplier applied to the session's existing risk score before the new judge score is added (default=0.85). Lower values make past hits fade faster. |
+| `trajectory_risk_soft_threshold` | `app/guardrails/risk_budget.py` | Risk score at or above which the judge runs on every turn regardless of `trajectory_every_n_turns` (default=0.5). |
+| `trajectory_risk_hard_threshold` | `app/guardrails/risk_budget.py` | Risk score at or above which the session is blocked with the fixed flagged response (default=0.85). |
 | `hallucination_check` | `app/guardrails/hallucination.py` | LLM judge that checks each factual claim in the drafted answer against the retrieved context. A flagged material claim triggers a regeneration. Fails closed. |
 | `policy_check` | `app/guardrails/policy.py` | LLM judge that checks the drafted answer against a medical-conduct rubric. A violation triggers a regeneration. Fails closed. |
 

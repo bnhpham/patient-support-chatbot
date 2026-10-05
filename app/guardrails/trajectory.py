@@ -39,7 +39,7 @@ class TrajectoryVerdict(BaseModel):
 
 
 class TrajectoryGuardrail:
-    def __init__(self, llm_client: LLMClient, risk_budget: SessionRiskBudget, every_n_turns: int = 3,
+    def __init__(self, llm_client: LLMClient, risk_budget: SessionRiskBudget, every_n_turns: int = 1,
                  unverifiable_response: str = DEFAULT_UNVERIFIABLE_RESPONSE,
                  flagged_response: str = DEFAULT_FLAGGED_RESPONSE) -> None:
 
