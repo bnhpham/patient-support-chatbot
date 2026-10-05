@@ -21,10 +21,13 @@ Thumbs.db
 desktop.ini
 
 # Attack-probe scripts and their run output
+tests/app/
 tests/old_attacks/
 tests/attacks/score_chunk_toolcall_sentinel.py
-tests/
-scripts/poison_index.py
+tests/attacks/hallucination.py
+tests/attacks/jailbreak.py
+tests/attacks/policy.py
+tests/attacks/trajectory.py
 
 # Editor
 .vscode/

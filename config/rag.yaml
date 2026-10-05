@@ -51,16 +51,18 @@ guardrails:
   # It is blind to attacks spread across many individually-unremarkable turns. That gap is covered
   # by trajectory_analysis below instead.
   jailbreak_strike_tracking: false
+  jailbreak_blacklist_limit: 1
   # RagInjectionGuardrail: llm-semantic-router/toolcall-sentinel, a pretrained ModernBERT injection
   # classifier (see app/guardrails/rag_injection.py). Runs on the retrieved chunks before the
   # prompt is built. Any chunk scoring above threshold on the INJECTION_RISK label is dropped from
   # context (not a full turn refusal).
   rag_injection_detection: false
+  rag_injection_threshold: 0.78
   # TrajectoryGuardrail (app/guardrails/trajectory.py): an LLM judge over the full conversation
   # transcript, run periodically (not every turn) and tracked via a decaying SessionRiskBudget
   # (app/guardrails/risk_budget.py). Catches slow-boil manipulation spread across many turns that
   # no single message reveals. Fail-closed: a judge-call/parse failure blocks the turn.
-  trajectory_analysis: false
+  trajectory_analysis: true
   # HallucinationGuardrail (app/guardrails/hallucination.py): an LLM judge checking every factual
   # claim in the drafted answer against the retrieved context. Runs inside the RAG pipeline after
   # generation. A flagged material claim triggers a regeneration (see generation.max_regenerations

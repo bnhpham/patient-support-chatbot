@@ -9,8 +9,8 @@ On top of the per-message DetectJailbreak check, this guardrail can optionally t
     - A 2nd flagged message blacklists that session outright.
     - Every message for the rest of it, flagged or not, gets blacklist_response without even reaching the detector, until the session ends.
 
-This escalation is now OFF by default. It is a per-message-only risk signal and is blind to attacks spread across many turns,
-each individually unremarkable.
+This escalation is OFF by default (strike_tracking=False). It is a per-message-only risk signal and is blind to attacks 
+spread across many turns, each individually unremarkable.
 
 That gap is covered by TrajectoryGuardrail + SessionRiskBudget, which look at the whole conversation rather than a strike count.
 The strike mechanism is kept and remains available via strike_tracking=True for anyone who wants the simpler, stricter behavior back.

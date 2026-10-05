@@ -13,7 +13,7 @@ guardrails_challenge/
 │   │   ├── output.py               # template for output guardrail
 │   │   ├── retrieval.py            # Retrieve chunks based on patient ID. Can be set off to test future PII leakage guardrails
 │   │   ├── jailbreak.py            # Jailbreak guardrail blocking single-message manipulation attempts
-│   │   ├── medication.py           # Medication guardrail to cross-check medication with other knowledge bases
+│   │   ├── medication.py           # Medication guardrail to cross-check retrieved RAG content with other knowledge bases
 │   │   ├── rag_injection.py        # RAG injection guardrail to filter out poisoned RAG data
 │   │   ├── trajectory.py           # Full-transcript LLM judge to detect multi-turn manipulation
 │   │   ├── risk_budget.py          # Decaying per-session risk score
@@ -142,7 +142,7 @@ python scripts/poison_index.py --patient "James Whitfield" --payload overdose
 
 Plants an attacker-controlled chunk into a real patient's own record, simulating indirect prompt
 injection via retrieved content rather than the chat message itself. `--payload` is one of
-`overdose`, `fake_credentials`, `system_prompt_leak` (see `scripts/poison_index.py`). Undo with
+`overdose`, `fake_credentials` (see `scripts/poison_index.py`). Undo with
 `--remove`, or just re-run `build_index.py` to rebuild clean indexes from scratch. The
 `tests/attacks/*.py` scripts do this automatically as part of each run - you don't need to run
 this manually just to use those.
@@ -150,7 +150,7 @@ this manually just to use those.
 ### 7. Run the backend
 
 ```bash
-uvicorn app.main:create_app --factory
+python -m uvicorn app.main:create_app --factory
 ```
 
 Serves on `http://localhost:8000`.
@@ -188,9 +188,11 @@ changes needed. The `guardrails:` section toggles each guardrail independently:
 |---|---|---|
 | `fact_check` | `app/guardrails/medication.py` | Cross-checks medications mentioned in retrieved chunks against a trusted reference (`data/drugs/drugs.yaml`) and flags dosage conflicts. |
 | `rag_injection_detection` | `app/guardrails/rag_injection.py` | Screens retrieved chunks (not the user's message) for injection risk, dropping flagged chunks from context. |
-| `jailbreak_detection` | `app/guardrails/jailbreak.py` | Screens the user's raw message for jailbreak attempts before the RAG pipeline runs; a session's 2nd flagged message blacklists the rest of that session. |
+| `rag_injection_threshold` | `app/guardrails/rag_injection.py` | INJECTION_RISK score above which a retrieved chunk is dropped (default=0.8). |
+| `jailbreak_detection` | `app/guardrails/jailbreak.py` | Screens the user's raw message for jailbreak attempts before the RAG pipeline runs. A flagged message is blocked with a fixed refusal. Repeated flags can additionally blacklist the session, see `jailbreak_strike_tracking` and `jailbreak_blacklist_limit`. |
 | `jailbreak_threshold` | `app/guardrails/jailbreak.py` | Score cutoff for the DetectJailbreak validator. |
 | `jailbreak_strike_tracking` | `app/guardrails/jailbreak.py` | Turns the strike count blacklist on or off. Off by default, so the row above no longer applies unless this is set to true. |
+| `jailbreak_blacklist_limit` | `app/guardrails/jailbreak.py` | Number of flagged messages a session may have before the next one blacklists it. Only used when `jailbreak_strike_tracking` is true. |
 | `trajectory_analysis` | `app/guardrails/trajectory.py` | Full-transcript LLM judge, run every few turns or once the session risk budget passes its soft threshold. Blocks the session once the budget passes its hard threshold. Fails closed. |
 | `hallucination_check` | `app/guardrails/hallucination.py` | LLM judge that checks each factual claim in the drafted answer against the retrieved context. A flagged material claim triggers a regeneration. Fails closed. |
 | `policy_check` | `app/guardrails/policy.py` | LLM judge that checks the drafted answer against a medical-conduct rubric. A violation triggers a regeneration. Fails closed. |
@@ -206,7 +208,7 @@ pytest tests/app
 # Live guardrail demo scripts - real Claude calls + real guardrail models, costs API tokens and (on first run) model-download bandwidth/time
 python tests/attacks/overdose.py       # poisoned dosage vs. fact_check
 python tests/attacks/jailbreak.py      # poisoned "doctor is an impostor" content vs. jailbreak_detection
-python tests/attacks/rag_injection.py  # all three poison payloads vs. rag_injection_detection
+python tests/attacks/rag_injection.py  # all poison payloads vs. rag_injection_detection
 ```
 
 Each `tests/attacks/*.py` script self-poisons and cleans up after itself, and saves a full

@@ -1,0 +1,48 @@
+# Trusted external medication reference for the medication guardrail.
+# One entry per drug. `relations` lists brand names / synonyms / class terms that
+# should map to this entry (note: a class like "NSAID" is not strictly a synonym -
+# mapping it here is a deliberate demo simplification).
+
+ibuprofen:
+  otc_max_daily_mg: 1200
+  otc_max_single_mg: 400
+  rx_max_daily_mg: 2400
+  relations: ["NSAID", "NSAIDs", "Advil", "Motrin", "Nurofen", "Brufen"]
+  source: "FDA OTC monograph; FDA Rx label (e.g. accessdata.fda.gov ibuprofen NDA 022348)"
+  warnings:
+    - "Stomach bleeding risk, higher with age 60+, alcohol use, anticoagulants, or prior ulcers"
+    - "Heart attack/stroke risk increases with dose and duration"
+    - "Avoid at 20+ weeks of pregnancy"
+    - "Allergy alert, especially in people with aspirin sensitivity/asthma"
+  adverse_reactions:
+    - "Dyspepsia, nausea, heartburn"
+    - "GI ulceration/bleeding"
+    - "Elevated blood pressure"
+    - "Renal impairment (esp. with dehydration or pre-existing kidney disease)"
+  drug_interactions:
+    - "Other NSAIDs or aspirin (additive GI/bleeding risk, may reduce aspirin's cardioprotective effect)"
+    - "Anticoagulants (e.g. warfarin) - increased bleeding risk"
+    - "ACE inhibitors/ARBs and diuretics - reduced antihypertensive effect, renal risk ('triple whammy')"
+    - "Lithium and methotrexate - reduced clearance, increased toxicity risk"
+
+naproxen:
+  otc_max_daily_mg: 660
+  otc_max_single_mg: 440
+  rx_max_daily_mg: 1500
+  relations: ["NSAID", "NSAIDs", "Aleve", "Naprosyn", "Anaprox"]
+  source: "FDA OTC monograph; FDA Rx label (e.g. Naprosyn/Anaprox label, accessdata.fda.gov)"
+  warnings:
+    - "Stomach bleeding risk, higher with age 60+, alcohol use, anticoagulants, or prior ulcers"
+    - "Heart attack/stroke risk increases with dose and duration"
+    - "Avoid at 20+ weeks of pregnancy"
+    - "Contraindicated in aspirin-sensitive asthma"
+  adverse_reactions:
+    - "Dyspepsia, heartburn, abdominal pain"
+    - "GI ulceration/bleeding"
+    - "Dizziness, headache"
+    - "Fluid retention/edema"
+  drug_interactions:
+    - "Other NSAIDs or aspirin (additive GI/bleeding risk)"
+    - "Anticoagulants - increased bleeding risk"
+    - "ACE inhibitors/ARBs and diuretics - reduced antihypertensive effect, renal risk"
+    - "Lithium and methotrexate - reduced clearance, increased toxicity risk"

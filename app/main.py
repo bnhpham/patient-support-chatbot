@@ -97,7 +97,7 @@ def create_app(
     sparse_retriever = sparse_retriever or _default_sparse_retriever(app_config, isolation_guardrail)
     hybrid_retriever = HybridRetriever(dense_retriever, sparse_retriever, isolation_guardrail)
     medication_guardrail = medication_guardrail or MedicationGuardrail(app_config.drugs_path)
-    rag_injection_guardrail = rag_injection_guardrail or (_default_rag_injection_guardrail() if rag_config.guardrails.rag_injection_detection else None)
+    rag_injection_guardrail = rag_injection_guardrail or (_default_rag_injection_guardrail(rag_config.guardrails.rag_injection_threshold) if rag_config.guardrails.rag_injection_detection else None)
     hallucination_guardrail = hallucination_guardrail or (HallucinationGuardrail(llm_client=llm_client) if rag_config.guardrails.hallucination_check else None)
     policy_guardrail = policy_guardrail or (PolicyGuardrail(llm_client=llm_client) if rag_config.guardrails.policy_check else None)
     rag_pipeline = RagPipeline(hybrid_retriever, llm_client, rag_config,
@@ -106,7 +106,8 @@ def create_app(
 
     # Additional guardrails
     input_guardrail = input_guardrail or (JailbreakGuardrail(threshold=rag_config.guardrails.jailbreak_threshold,
-                                                             strike_tracking=rag_config.guardrails.jailbreak_strike_tracking)
+                                                             strike_tracking=rag_config.guardrails.jailbreak_strike_tracking,
+                                                             blacklist_limit=rag_config.guardrails.jailbreak_blacklist_limit)
                                           if rag_config.guardrails.jailbreak_detection else NoOpInputGuardrail())
     output_guardrail = output_guardrail or NoOpOutputGuardrail()
 
@@ -168,9 +169,9 @@ def _default_sparse_retriever(app_config: AppConfig, isolation_guardrail: Patien
 # RAG injection guardrail used when running the app with "uvicorn app.main:create_app --factory".
 # Returns None (a no-op passthrough in the pipeline) rather than crashing startup if the model
 # can't be loaded (e.g. no network to download it from the Hugging Face Hub on first run).
-def _default_rag_injection_guardrail() -> RagInjectionGuardrail | None:
+def _default_rag_injection_guardrail(threshold: float) -> RagInjectionGuardrail | None:
     try:
-        return RagInjectionGuardrail()
+        return RagInjectionGuardrail(threshold=threshold)
     except Exception:
         logger.exception("guardrails.rag_injection_detection is on but RagInjectionGuardrail failed to load. Falling back to no check.")
         return None

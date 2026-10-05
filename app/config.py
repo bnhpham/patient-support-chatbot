@@ -64,7 +64,9 @@ class GuardrailsConfig(BaseModel):
     jailbreak_detection: bool = False
     jailbreak_threshold: float = 0.725
     jailbreak_strike_tracking: bool = False
+    jailbreak_blacklist_limit: int = 1
     rag_injection_detection: bool = False
+    rag_injection_threshold: float = 0.8
     trajectory_analysis: bool = False
     hallucination_check: bool = False
     policy_check: bool = False
