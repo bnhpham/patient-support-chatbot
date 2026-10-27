@@ -1,4 +1,4 @@
-# A Patient Support Chatbot
+# Patient Support Chatbot
 
 This repository demonstrates a chatbot that answers a patient's questions about their own doctor visit. The focus of this project was to implement a set of pluggable guardrails against LLM attacks (such as prompt injections, jailbreaks and RAG poisoning) as well as hallucination and policy violation. See [DESIGN.md](DESIGN.md) for the design rationale behind each guardrail.
 
